@@ -10,12 +10,12 @@ func Filter[T any](ctx context.Context, source <-chan T, predicate func(ctx cont
 			select {
 			case <-ctx.Done():
 				return
-			case article, ok := <-source:
+			case element, ok := <-source:
 				if !ok {
 					return
 				}
-				if predicate(ctx, article) {
-					out <- article
+				if predicate(ctx, element) {
+					out <- element
 				}
 			}
 		}
