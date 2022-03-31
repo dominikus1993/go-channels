@@ -8,14 +8,7 @@ import (
 )
 
 func TestFilter(t *testing.T) {
-	numbers := make(chan int, 10)
-	go func() {
-		for _, a := range rangeInt(1, 10) {
-			numbers <- a
-		}
-		close(numbers)
-	}()
-
+	numbers := FromSlice(rangeInt(1, 10))
 	result := Filter(context.TODO(), numbers, func(ctx context.Context, element int) bool { return element%2 == 0 })
 	subject := ToSlice(result)
 	assert.Len(t, subject, 4)
@@ -25,14 +18,7 @@ func TestFilter(t *testing.T) {
 func BenchmarkFilter(b *testing.B) {
 	ctx := context.TODO()
 	for n := 0; n < b.N; n++ {
-		numbers := make(chan int, 10)
-		go func() {
-			for _, a := range rangeInt(0, 10) {
-				numbers <- a
-			}
-			close(numbers)
-		}()
-
+		numbers := FromSlice(rangeInt(1, 10))
 		ToSlice(Filter(ctx, numbers, func(ctx context.Context, element int) bool { return element%2 == 0 }))
 	}
 }

@@ -16,13 +16,7 @@ func rangeInt(from, to int) []int {
 
 // BenchmarkToSlice-4       1302279               897.8 ns/op           688 B/op         12 allocs/op
 func TestToSlice(t *testing.T) {
-	numbers := make(chan int, 10)
-	go func() {
-		for _, a := range rangeInt(0, 10) {
-			numbers <- a
-		}
-		close(numbers)
-	}()
+	numbers := FromSlice(rangeInt(1, 10))
 
 	result := ToSlice(numbers)
 	assert.Len(t, result, 10)
@@ -31,13 +25,7 @@ func TestToSlice(t *testing.T) {
 
 func BenchmarkToSlice(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		numbers := make(chan int, 10)
-		go func() {
-			for _, a := range rangeInt(0, 10) {
-				numbers <- a
-			}
-			close(numbers)
-		}()
+		numbers := FromSlice(rangeInt(1, 10))
 
 		ToSlice(numbers)
 	}
