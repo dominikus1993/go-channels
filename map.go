@@ -2,7 +2,7 @@ package channels
 
 import "context"
 
-func Map[T any, TMap any](ctx context.Context, source <-chan T, f func(ctx context.Context, element T) TMap) <-chan TMap {
+func Map[T any, TMap any](ctx context.Context, source Stream[T], f func(ctx context.Context, element T) TMap) Stream[TMap] {
 	out := make(chan TMap)
 	go func() {
 		defer close(out)
@@ -10,7 +10,7 @@ func Map[T any, TMap any](ctx context.Context, source <-chan T, f func(ctx conte
 			select {
 			case <-ctx.Done():
 				return
-			case element, ok := <-source:
+			case element, ok := <-source.channel:
 				if !ok {
 					return
 				}
@@ -18,5 +18,5 @@ func Map[T any, TMap any](ctx context.Context, source <-chan T, f func(ctx conte
 			}
 		}
 	}()
-	return out
+	return Stream[TMap]{channel: out}
 }

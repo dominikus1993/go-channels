@@ -5,12 +5,12 @@ import (
 	"sync"
 )
 
-func FanIn[T any](ctx context.Context, stream ...<-chan T) chan T {
+func FanIn[T any](ctx context.Context, stream ...Stream[T]) Stream[T] {
 	var wg sync.WaitGroup
 	out := make(chan T)
-	output := func(c <-chan T) {
+	output := func(c Stream[T]) {
 		defer wg.Done()
-		for v := range c {
+		for v := range c.channel {
 			select {
 			case <-ctx.Done():
 				return
@@ -26,5 +26,5 @@ func FanIn[T any](ctx context.Context, stream ...<-chan T) chan T {
 		wg.Wait()
 		close(out)
 	}()
-	return out
+	return Stream[T]{channel: out}
 }
